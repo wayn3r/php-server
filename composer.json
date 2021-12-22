@@ -1,0 +1,13 @@
+{
+    "name": "wayn3r/php-server",
+    "description": "Estructura de un servidor de PHP para creaci\u0000n de REST APIs",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "wayn3r",
+            "email": "w9delacruz@gmail.com"
+        }
+    ],
+    "require": {}
+}

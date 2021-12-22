@@ -1,6 +1,13 @@
 <?php
+// APP VARIABLES
+define('root', $_SERVER['DOCUMENT_ROOT']);
+define('app', '/src');
 
-define('route', '__CLIENT_REQUESTED_URI__');
+// DATABASE VARIABLES
+define('DB_ODBC', '',);
+define('DB_USER', '',);
+define('DB_PASS', '');
+define('DB_NAME', '');
 
 // HTTP VARIABLES
 define('CONTINUE', 100);

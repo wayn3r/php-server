@@ -27,7 +27,7 @@ header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
 // Cargando todos los archivos para procesar la petición
-require_once 'Core/Loader.php';
+require_once  'core/autoload.php';
 
 // Procesando la peticion y devolviendo la respuesta
 echo \Core\Router::route();

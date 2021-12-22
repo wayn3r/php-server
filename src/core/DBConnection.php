@@ -7,50 +7,10 @@ class DBConnection {
     public $conexion;
     public string $MainDB;
 
-
     private function __construct() {
-        $this->connect();
+        $this->MainDB = DB_NAME;
+        $this->conexion = odbc_connect(DB_ODBC, DB_USER, DB_PASS);
     }
-    public function __destruct() {
-        $this->disconnect();
-    }
-    public static function getInstance(): self {
-        self::$instance ??= new \Core\DBConnection();
-        return self::$instance;
-    }
-    public static function autocommit(bool $autocommit = false) {
-        self::getInstance();
-        odbc_autocommit(self::$instance->conexion, $autocommit);
-    }
-    public static function commit() {
-        self::getInstance();
-        odbc_commit(self::$instance->conexion);
-    }
-    public static function rollback() {
-        self::getInstance();
-        odbc_rollback(self::$instance->conexion);
-    }
-    public function query(string $sqlQuery, string ...$args): \Core\DBResponse {
-        $sqlQuery = $this->prepareSQL($sqlQuery, ...$args);
-        $sqlQuery = utf8_decode($sqlQuery);
-        try {
-            $request = new \Core\DBResponse(
-                odbc_exec($this->conexion, $sqlQuery),
-                false
-            );
-            if ($request->result !== false) {
-                return $request;
-            }
-
-            $request->error = true;
-            $request->message = odbc_errormsg();
-            return $request;
-        } catch (\Exception $e) {
-            \Core\DBConnection::rollback();
-            throw new \Exception("Ha ocurrido un error al intentar consultar la base de datos \n" . $e->getMessage());
-        }
-    }
-
     private function preventSQLInjection(string $param): string {
         $param = str_replace(["'", '"', '`', '$', '%', '#', '&'], '', $param);
         return $param;
@@ -81,18 +41,45 @@ class DBConnection {
         }
         return implode('', $sqlArray);
     }
-    private function dbconfig() {
-        return json_decode(file_get_contents('Core/database.json'));
-    }
 
-    private function connect() {
-        $config = $this->dbconfig();
-
-        $this->MainDB = $config->database;
-        $this->conexion = odbc_connect($config->odbc, $config->user, $config->password);
-    }
-
-    private function disconnect() {
+    public function __destruct() {
         odbc_close($this->conexion);
+    }
+    public static function getInstance(): self {
+        self::$instance ??= new \Core\DBConnection();
+        return self::$instance;
+    }
+    public static function autocommit(bool $autocommit = false) {
+        self::getInstance();
+        odbc_autocommit(self::$instance->conexion, $autocommit);
+    }
+    public static function commit() {
+        self::getInstance();
+        odbc_commit(self::$instance->conexion);
+    }
+    public static function rollback() {
+        self::getInstance();
+        odbc_rollback(self::$instance->conexion);
+    }
+
+    public function query(string $sqlQuery, string ...$args): \Core\DBResponse {
+        $sqlQuery = $this->prepareSQL($sqlQuery, ...$args);
+        $sqlQuery = utf8_decode($sqlQuery);
+        try {
+            $request = new \Core\DBResponse(
+                odbc_exec($this->conexion, $sqlQuery),
+                false
+            );
+            if ($request->result !== false) {
+                return $request;
+            }
+
+            $request->error = true;
+            $request->message = odbc_errormsg();
+            return $request;
+        } catch (\Exception $e) {
+            \Core\DBConnection::rollback();
+            throw new \Exception("Ha ocurrido un error al intentar consultar la base de datos \n" . $e->getMessage());
+        }
     }
 }

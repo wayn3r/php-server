@@ -3,10 +3,11 @@
 namespace Core;
 
 class Router {
-    private static $no_required_param_id = '@';
-    private static $url_param_id = ':';
-    private static $lazy_url_match = '@:';
-    private static $routes_path = 'Routes/';
+    private static $noRequiredParamId = '@';
+    private static $urlParamId = ':';
+    private static $lazyUrlMatch = '@:';
+    private static $routesPath = root . app . '/routes/';
+    private static string $requestedUrl;
     private static array $get = [];
     private static array $post = [];
     private static array $put = [];
@@ -43,17 +44,17 @@ class Router {
         $params_routes = array_filter(
             $current_methods,
             function (string $posible_route) use ($splited_route) {
-                return (mb_strpos($posible_route, self::$url_param_id) !== false
+                return (mb_strpos($posible_route, self::$urlParamId) !== false
                     && count($splited_route) === count(explode('/', $posible_route)))
-                    || mb_strpos($posible_route, self::$lazy_url_match);
+                    || mb_strpos($posible_route, self::$lazyUrlMatch);
             },
             ARRAY_FILTER_USE_KEY
         );
-        foreach ($params_routes as $_route => $method) {
+        foreach ($params_routes as $_route => $_) {
             if (
-                mb_strpos($_route, self::$lazy_url_match) !== false
+                mb_strpos($_route, self::$lazyUrlMatch) !== false
                 && \Helpers\Tools::startsWith(
-                    ([$lazy_route, $lazy_param] = explode(self::$lazy_url_match, $_route))[0],
+                    ([$lazy_route, $lazy_param] = explode(self::$lazyUrlMatch, $_route))[0],
                     $route
                 )
             ) {
@@ -62,14 +63,14 @@ class Router {
             }
             $_route = explode('/', $_route);
             foreach ($_route as $index => $string) {
-                $is_param = substr($string, 0, 1) === self::$url_param_id;
+                $is_param = substr($string, 0, 1) === self::$urlParamId;
                 if (
                     !$is_param
                     && $string !== $splited_route[$index]
                 ) break;
 
                 if ($is_param) {
-                    $param = ltrim($string, self::$url_param_id);
+                    $param = ltrim($string, self::$urlParamId);
                     if ($splited_route[$index] !== '')
                         $_REQUEST[$param] = $splited_route[$index];
                     $splited_route[$index] = $string;
@@ -84,11 +85,11 @@ class Router {
 
         // Guardando datos ordenados y con el tipo de dato especificado
         foreach (self::$route['params'] as $param => $type) {
-            $required = substr($param, 0, 1) !== self::$no_required_param_id;
+            $required = substr($param, 0, 1) !== self::$noRequiredParamId;
             if ($required && !isset($data[$param])) return "Parametros requeridos no fueron suministrados, el campo [{$param}] es requerido";
 
 
-            $param = ltrim($param, self::$no_required_param_id);
+            $param = ltrim($param, self::$noRequiredParamId);
 
             if (isset($data[$param])) {
                 if (
@@ -151,31 +152,31 @@ class Router {
      * El archivo de la carpeta Routes que coincida con $route
      * devuelve un string vacío en caso de no encontrarlo
      */
-    public static function getRoute(string $route): string {
+    public static function getRouteFile() {
+        $url = \Helpers\Tools::leftTrim('/', $_SERVER['REQUEST_URI']);
+        [$route] = explode('/', $url);
+
+        self::$requestedUrl = \Helpers\Tools::leftTrim($route, '', $url);
+
+        if (!is_dir(self::$routesPath)) return;
+
         $route .= '.php';
-        if (is_file(self::$routes_path . $route))
-            return self::$routes_path . $route;
+        if (is_file(self::$routesPath . $route))
+            return require_once self::$routesPath . $route;
 
-        if (!is_dir(self::$routes_path))
-            return '';
-
-        $routes = scandir(self::$routes_path);
+        $routes = scandir(self::$routesPath);
         $route = strtolower($route);
-
         foreach ($routes as $files) {
             if ($route === strtolower($files))
-                return self::$routes_path . $files;
+                return require_once self::$routesPath . $files;
         }
-        return '';
     }
 
     public static function route(): \Core\HttpResponse {
-        // Verificando que haya una ruta en la peticicion
-        if (!isset($_GET[route]))
-            return new \Core\HttpResponse(BAD_REQUEST, 'Ruta invalida');
-
+        // obteniedo la ruta y el archivo correspondiente
+        self::getRouteFile();
         //Inicializando el result como un HttpResponse con datos genericos
-        $route = self::filterUrl($_GET[route]);
+        $route = self::filterUrl(self::$requestedUrl);
         // Buscando las rutas guardadas dependiendo el tipo de metodo http utilizado en la peticicion
         $current_request_method = self::get_current_method();
         // Verificando si hay parametros pasados por la url, de ser asi se pondran en la variable $_REQUEST
@@ -193,7 +194,7 @@ class Router {
         // dividiendo los parametros suministrados por el usuario entre los requeridos por el controlador y los que no
         [$params, $body] = $params_result;
 
-        [$controller, $method] = explode(self::$no_required_param_id, self::$route['controller']);
+        [$controller, $method] = explode(self::$noRequiredParamId, self::$route['controller']);
 
         $controller = '\\Controller\\' . $controller;
         // Verificando que exista la clase antes de instanciarla

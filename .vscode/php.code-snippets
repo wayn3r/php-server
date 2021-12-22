@@ -1,0 +1,152 @@
+{
+    /*
+    PHP Snippets
+  */
+    "Crear controlador": {
+        "scope": "php",
+        "prefix": "ctrl",
+        "body": [
+            "\nnamespace Controller;\n",
+            "class ${TM_FILENAME/(.*)\\..+$/$1/} extends \\Core\\Controller {",
+            "\t/**",
+            "\t * Lista todos los datos del modelo \\Model\\\\${TM_FILENAME/(.*)\\..+$/$1/}",
+            "\t * @return \\Core\\HttpResponse",
+            "\t * Es la respuesta a una petición HTTP",
+            "\t */",
+            "\tpublic function ${1:List${TM_FILENAME/(.*)\\..+$/$1/}}(): \\Core\\HttpResponse {",
+            "\t\t\\$${2:data} = new \\Model\\\\${TM_FILENAME/(.*)\\..+$/$1/};",
+            "\t\treturn new \\Core\\HttpResponse(OK, \\$${2:data}->List());",
+            "\t}",
+            "}\n"
+        ],
+        "description": "Crea un Controller con un metodo base para List el modelo con el mismo nombre"
+    },
+    "Crear endpoint": {
+        "scope": "php",
+        "prefix": "ctend",
+        "body": [
+            "/**",
+            " * ${2:Una pequeña descripción de lo que hace el endpoint}",
+            " * @return \\Core\\HttpResponse",
+            " * Es la respuesta a una petición HTTP",
+            " */",
+            "public function ${1:Endpoint}(): \\Core\\HttpResponse {",
+            "\t${3}",
+            "\treturn new \\Core\\HttpResponse(OK, ${4:null /*some data*/});",
+            "}"
+        ],
+        "description": "Crea la estructura de una función de un controlador"
+    },
+    "Crear endpoint con parametro": {
+        "scope": "php",
+        "prefix": "ctpend",
+        "body": [
+            "/**",
+            " * ${4:Una pequeña descripción de lo que hace el endpoint}",
+            " * @param ${2:type} \\$${3:param}",
+            " * ${5:Una pequeña descripción del parametro}",
+            " * @return \\Core\\HttpResponse",
+            " * Es la respuesta a una petición HTTP",
+            " */",
+            "public function ${1:Endpoint}(${2} \\$${3}): \\Core\\HttpResponse {",
+            "\t${6}",
+            "\treturn new \\Core\\HttpResponse(OK, ${7:null /*some data*/});",
+            "}"
+        ],
+        "description": "Crea la estructura de una función de un controlador"
+    },
+    "Crear función": {
+        "scope": "php",
+        "prefix": "func",
+        "body": [
+            "/**",
+            " * ${3:Una pequeña descripción de lo que hace la función}",
+            " * @return ${2:return-type}",
+            " * ${4:Describe lo que devuelve la función, si devuelve algo}",
+            " */",
+            "public function ${1:FunctionName}(): ${2} {",
+            "\t${5}",
+            "\treturn ${6:${2}};",
+            "}"
+        ],
+        "description": "Crea una función"
+    },
+    "Crear función con parametro": {
+        "scope": "php",
+        "prefix": "pfunc",
+        "body": [
+            "/**",
+            " * ${5:Una pequeña descripción de lo que hace la función}",
+            " * @param ${2:type} \\$${3:param}",
+            " * ${6:Una pequeña descripción del parametro}",
+            " * @return ${4:return-type}",
+            " * ${7:Describe lo que devuelve la función, si devuelve algo}",
+            " */",
+            "public function ${1:FunctionName}(${2} \\$${3}): ${4} {",
+            "\t${8}",
+            "\treturn ${9:${4}};",
+            "}"
+        ],
+        "description": "Crea una función con parametro"
+    },
+    "Crear middleware": {
+        "scope": "php",
+        "prefix": "crmid",
+        "body": [
+            "\nnamespace Middlewares;\n",
+            "class ${TM_FILENAME/(.*)\\..+$/$1/} extends \\Core\\Middleware {",
+            "\t/**",
+            "\t * ${3:Una pequeña descripción de lo que valida la función}",
+            "\t * @param string \\$${2:param}",
+            "\t * El nombre del parametro a validar de la petición",
+            "\t * @return callable",
+            "\t * Devuelve una función que es la encargada de validar la petición",
+            "\t */",
+            "\tpublic static function ${1:functionName}(string \\$${2}): callable {",
+            "\t\treturn function(\\Core\\HttpRequest \\$request) use (\\$${2}) {",
+            "\t\t\t\\$${4:data} = @\\$request->params[\\$${2}];",
+            "\t\t\t${5}",
+            "\t\t};",
+            "\t}",
+            "}\n"
+        ],
+        "description": "Crea un Controller con un metodo base para List el modelo con el mismo nombre"
+    },
+    "Crear función middlware": {
+        "scope": "php",
+        "prefix": "mid",
+        "body": [
+            "/**",
+            " * ${2:Una pequeña descripción de lo que valida la función}",
+            " * @return callable",
+            " * Devuelve una función que es la encargada de validar la petición",
+            " */",
+            "public static function ${1:functionName}(): callable {",
+            "\treturn function(\\Core\\HttpRequest \\$request) {",
+            "\t\t${3}",
+            "\t};",
+            "}"
+        ],
+        "description": "Crea un middlware que devuelve una función"
+    },
+    "Crear función middlware con parametro": {
+        "scope": "php",
+        "prefix": "pmid",
+        "body": [
+            "/**",
+            " * ${3:Una pequeña descripción de lo que valida la función}",
+            " * @param string \\$${2:param}",
+            " * El nombre del parametro a validar de la petición",
+            " * @return callable",
+            " * Devuelve una función que es la encargada de validar la petición",
+            " */",
+            "public static function ${1:functionName}(string \\$${2}): callable {",
+            "\treturn function(\\Core\\HttpRequest \\$request) use (\\$${2}) {",
+            "\t\t\\$${4:data} = @\\$request->params[\\$${2}];",
+            "\t\t${5}",
+            "\t};",
+            "}"
+        ],
+        "description": "Crea un middlware que devuelve una función con parametro"
+    }
+}

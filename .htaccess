@@ -1,0 +1,10 @@
+Options +FollowSymLinks
+RewriteEngine on
+
+# El RewriteCond es una condición que debe cumplirse para que el RewriteRule se aplique.
+# Con el [!-f] me aseguro que no se aplique si el archivo existe.
+# Se podria usar [!-d] para carpetas pero no es necesario.
+RewriteCond %{REQUEST_FILENAME} !-f
+# Aqui estoy tomando toda la URL despues de /API/ y la paso como el route.
+# Con el flag [QSA] se pasan automaticamente los query params de la petición.
+RewriteRule ^(.*)$ src/index.php?__CLIENT_REQUESTED_URI__=$1 [QSA]

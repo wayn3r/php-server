@@ -29,5 +29,15 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 // Cargando todos los archivos para procesar la petición
 require_once  'core/autoload.php';
 
-// Procesando la peticion y devolviendo la respuesta
-echo \Core\Router::route();
+// recogiendo cualquier mensaje escrito en el cuerpo de la pagina
+ob_start();
+
+// Procesando la peticion 
+$response = \Core\Router::route();
+
+$response->warning = preg_replace('/(\\n)|(<[^>]*>)/i', '', ob_get_contents());
+// eliminando cualquier mensaje escrito en el cuerpo de la pagina
+ob_clean();
+
+// devolviendo la respuesta
+echo $response;

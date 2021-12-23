@@ -205,8 +205,7 @@ class Router {
         if (!class_exists($controller))
             return new \Core\HttpResponse(INTERNAL_SERVER_ERROR, 'El controlador asociado a esta ruta no esta definido');
 
-        // recogiendo cualquier mensaje escrito en el cuerpo de la pagina
-        ob_start();
+        
         // creando el request del usuario
         $request = new \Core\HttpRequest($params, $body);
         // creando el response que se enviará al usuario
@@ -233,9 +232,7 @@ class Router {
         } catch (\Exception $e) {
             $response->error = $e->getMessage();
         }
-        $response->warning = preg_replace('/(\\n)|(<[^>]*>)/i', '', ob_get_clean());
-        // eliminando cualquier mensaje escrito en el cuerpo de la pagina
-        ob_clean();
+       
         // Si existe algun error se devuelve
         if ($response->error) $response->status = INTERNAL_SERVER_ERROR;
 

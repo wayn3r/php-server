@@ -1,7 +1,21 @@
 <?php
+
+/*******************************
+ * CONFIGURACIÓN DEL PROYECTO  
+ *******************************/
+setlocale(
+    LC_ALL,
+    'Spanish_Dominican_Republic',
+    'Spanish_Spain',
+    'es_ES',
+    'Spanish',
+    'es_ES@euro',
+    'es_ES',
+    'esp'
+);
+
 // APP VARIABLES
 define('root', $_SERVER['DOCUMENT_ROOT']);
-define('app', '/src');
 
 // DATABASE VARIABLES
 define('DB_ODBC', '',);

@@ -11,6 +11,25 @@
     ],
     "require": {},
     "scripts": {
-        "start": "php -S localhost:8000 src/index.php"
+        "start": "php -S localhost:8000 -c php.ini src/index.php ",
+        "start:dev": "composer dump && composer start"
+    },
+    "autoload": {
+        "psr-4": {
+            "Core\\": "src/core/",
+            "Model\\": "src/model/",
+            "Dataset\\": "src/dataset/",
+            "Controller\\": "src/constroller/",
+            "Helpers\\": "src/helpers/",
+            "Middlewares\\": "src/middlewares/",
+            "Routes\\": "src/routes/",
+            "Utilities\\": "src/utilities/"
+        },
+        "files": [
+            "src/core/config.php"
+        ]
+    },
+    "config": {
+        "process-timeout": 0
     }
 }

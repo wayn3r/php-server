@@ -25,5 +25,8 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
 
 // Procesando la peticion y devolviendo la respuesta
-$app = new \Core\Router;
-echo $app->start();
+$app = \Http\Server::init();
+
+// $app->use('/user', fn () => \App\Router::user());
+
+$app->start();

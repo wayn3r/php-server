@@ -3,6 +3,5 @@
 namespace Core;
 
 abstract class Controller {
-    public \Core\HttpRequest $request;
-
+    public \Http\Request $request;
 }

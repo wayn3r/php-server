@@ -17,6 +17,7 @@
     "autoload": {
         "psr-4": {
             "Core\\": "src/core/",
+            "Http\\": "src/http/",
             "Model\\": "src/model/",
             "Dataset\\": "src/dataset/",
             "Controller\\": "src/constroller/",

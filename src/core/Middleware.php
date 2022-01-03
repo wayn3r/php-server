@@ -13,19 +13,19 @@ class Middleware extends \Utilities\Validator {
      * Devuelve una función que es la encargada de validar la petición
      */
     public static function validarModelo(string $param, bool $strict = false): callable {
-        return function (\Core\HttpRequest $request) use ($param, $strict) {
+        return function (\Http\Request $request) use ($param, $strict) {
             /** @var \Core\Model $model */
             $model = @$request->params[$param];
             // verificar los errores en el modelo
             if ($errors = $model->validate($strict))
-                return new \Core\HttpResponse(BAD_REQUEST, $errors);
+                return new \Http\Response(BAD_REQUEST, $errors);
         };
     }
 
     public function param(string $param): callable {
         $validators = $this->validators;
         $this->clearValidators();
-        return function (\Core\HttpRequest $request) use ($param, $validators) {
+        return function (\Http\Request $request) use ($param, $validators) {
             $this->validators = $validators;
             $this->check($request->params, $param, false);
         };
@@ -33,7 +33,7 @@ class Middleware extends \Utilities\Validator {
     public function body(string $param): callable {
         $validators = $this->validators;
         $this->clearValidators();
-        return function (\Core\HttpRequest $request) use ($param, $validators) {
+        return function (\Http\Request $request) use ($param, $validators) {
             $this->validators = $validators;
             $this->check($request->body, $param, false);
         };
@@ -42,7 +42,7 @@ class Middleware extends \Utilities\Validator {
     public function checkout() {
         return function () {
             if ($errors = $this->errors())
-                return new \Core\HttpResponse(BAD_REQUEST, $errors);
+                return new \Http\Response(BAD_REQUEST, $errors);
         };
     }
 }

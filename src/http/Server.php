@@ -9,23 +9,36 @@ class Server {
     private function __construct() {
         $this->routers = [];
     }
-    public static function init(): \Http\Server {
+    private function sanitize(string $url) {
+        $url = strtolower($url);
+        $filteredUrl = filter_var($url, FILTER_SANITIZE_URL);
+        return $filteredUrl;
+    }
+    public static function getServer(): \Http\Server {
         return self::$server ??= new \Http\Server;
     }
-    public function use(string $baseURL, callable $getRouter): void {
-        $router = $getRouter();
-        if ($router instanceof \Http\Router) {
-            $this->routers[$baseURL] = $router;
-        }
+    public function use(string $baseURL, \Http\Router $router): void {
+        $this->routers[$baseURL] = $router;
     }
 
     public function start() {
-        $url = $_SERVER['REQUEST_URI'];
-        print_r($_SERVER);
+        $url = $this->sanitize($_SERVER['REQUEST_URI']);
+        if ($router = $this->getRouter($url)) {
+            $router->start($url);
+        }
     }
 
-    public function getRouter(string $baseURL): ?\Http\Router {
-        $splited_url = explode('/', $baseURL);
-        return $this->routers[$baseURL] ?? null;
+    public function getRouter(string &$url): ?\Http\Router {
+        $splitedUrl = explode('/', $url);
+        array_shift($splitedUrl);
+        $baseURL = '';
+        foreach ($splitedUrl as $partialUrl) {
+            $baseURL .= '/' . $partialUrl;
+            if (isset($this->routers[$baseURL])) {
+                $url = \Helpers\Tools::leftTrim($baseURL, $url);
+                return $this->routers[$baseURL];
+            }
+        }
+        return null;
     }
 }

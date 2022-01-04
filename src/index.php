@@ -23,10 +23,10 @@ header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
-
+$userRouter = require_once('user/router/router.php');
 // Procesando la peticion y devolviendo la respuesta
-$app = \Http\Server::init();
+$app = \Http\Server::getServer();
 
-// $app->use('/user', fn () => \App\Router::user());
+$app->use('/user', $userRouter);
 
 $app->start();

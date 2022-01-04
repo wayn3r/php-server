@@ -9,10 +9,6 @@ class Router {
     private string $requestedUrl;
     private array $routes = [];
 
-    public function __construct() {
-        $this->requestedUrl = $this->sanitize($_SERVER['REQUEST_URI']);
-        $this->requireRoutes();
-    }
     private function requireRoutes() {
         $url = \Helpers\Tools::leftTrim('/', $this->requestedUrl);
         [$route] = explode('/', $url);
@@ -33,16 +29,15 @@ class Router {
         }
     }
     private function setRoute(string $method, string $path, array $controllers) {
-        $this->routes[$path][$method] = new \Http\Route($method, $path, $controllers);
+        $this->routes[$path][$method][] = new \Http\Route($method, $path, $controllers);
     }
     /** @return \Http\Route[] */
-    private function getRoutes() {
-        $routes = $this->routes[$this->requestedUrl];
+    private function getRoutes(): array {
         $method = $_SERVER['REQUEST_METHOD'];
-        return array_merge(
-            $routes['ALL_REQUESTS'] ?? [],
-            $routes[$method] ?? []
-        );
+        $routes = $this->routes[$this->requestedUrl][$method] ?? [];
+        $mids = $routes['ALL_REQUESTS'] ?? [];
+
+        return [...$mids, ...$routes];
     }
     /** @return callable[] */
     private function getControllers() {
@@ -68,11 +63,7 @@ class Router {
     public function put(string $route, callable ...$controllers) {
         $this->setRoute('PUT', $route, $controllers);
     }
-    private function sanitize(string $url) {
-        $url = strtolower($url);
-        $filteredUrl = filter_var($url, FILTER_SANITIZE_URL);
-        return $filteredUrl;
-    }
+
     private function getRequestParams() {
         // $route = $this->requestedUrl;
         // $splited_route = explode('/', $route);
@@ -139,7 +130,8 @@ class Router {
         return $response;
     }
 
-    public function start(): \Http\Response {
+    public function start(string $url): \Http\Response {
+        $this->requestedUrl = $url;
         $params = $this->getRequestParams();
         $query = $this->getRequestQuery();
         $body = $this->getRequestBody();

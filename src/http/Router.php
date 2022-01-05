@@ -2,108 +2,50 @@
 
 namespace Http;
 
+use function PHPSTORM_META\type;
 
 class Router {
-    private $urlParamId = ':';
-    private $routesPath = root .  'src/routes/';
+    private const URL_PARAM_ID = ':';
     private string $requestedUrl;
+    /** @var \Http\Route[]  */
     private array $routes = [];
 
-    private function requireRoutes() {
-        $url = \Helpers\Tools::leftTrim('/', $this->requestedUrl);
-        [$route] = explode('/', $url);
-
-        $this->requestedUrl = \Helpers\Tools::leftTrim($route, '', $url);
-
-        if (!is_dir($this->routesPath)) return;
-
-        $route .= '.php';
-        if (is_file($this->routesPath . $route))
-            return require_once $this->routesPath . $route;
-
-        $routes = scandir($this->routesPath);
-        $route = strtolower($route);
-        foreach ($routes as $files) {
-            if ($route === strtolower($files))
-                return require_once $this->routesPath . $files;
-        }
-    }
     private function setRoute(string $method, string $path, array $controllers) {
-        $this->routes[$path][$method][] = new \Http\Route($method, $path, $controllers);
+        $this->routes[] = new \Http\Route($method, $path, $controllers);
     }
-    /** @return \Http\Route[] */
-    private function getRoutes(): array {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $routes = $this->routes[$this->requestedUrl][$method] ?? [];
-        $mids = $routes['ALL_REQUESTS'] ?? [];
 
-        return [...$mids, ...$routes];
-    }
     /** @return callable[] */
     private function getControllers() {
-        $routes = $this->getRoutes();
         $controllers = [];
-        foreach ($routes as $route) {
-            $controllers = array_merge($controllers, $route->controllers());
+        $method = $_SERVER['REQUEST_METHOD'];
+        foreach ($this->routes as $route) {
+            if ($route->match($method, $this->requestedUrl)) {
+                $controllers = array_merge($controllers, $route->controllers());
+            }
         }
         return $controllers;
     }
-    public function use(string $route, callable ...$controllers) {
-        $this->setRoute('ALL_REQUESTS', $route, $controllers);
+    public function use($path, callable ...$controllers) {
+        if (is_callable($path)) {
+            $controllers = [$path, ...$controllers];
+            $path = \Http\Route::ALL;
+        }
+        $this->setRoute(\Http\Route::ALL, $path, $controllers);
     }
-    public function post(string $route, callable ...$controllers) {
-        $this->setRoute('POST', $route, $controllers);
+    public function post(string $path, callable ...$controllers) {
+        $this->setRoute(\Http\Route::POST, $path, $controllers);
     }
-    public function get(string $route, callable ...$controllers) {
-        $this->setRoute('GET', $route, $controllers);
+    public function get(string $path, callable ...$controllers) {
+        $this->setRoute(\Http\Route::GET, $path, $controllers);
     }
-    public function delete(string $route, callable ...$controllers) {
-        $this->setRoute('DELETE', $route, $controllers);
+    public function delete(string $path, callable ...$controllers) {
+        $this->setRoute(\Http\Route::DELETE, $path, $controllers);
     }
-    public function put(string $route, callable ...$controllers) {
-        $this->setRoute('PUT', $route, $controllers);
+    public function put(string $path, callable ...$controllers) {
+        $this->setRoute(\Http\Route::PUT, $path, $controllers);
     }
 
     private function getRequestParams() {
-        // $route = $this->requestedUrl;
-        // $splited_route = explode('/', $route);
-        // $params_routes = array_filter(
-        //     $this->routes,
-        //     function (string $posible_route) use ($splited_route) {
-        //         return (mb_strpos($posible_route, $this->urlParamId) !== false
-        //             && count($splited_route) === count(explode('/', $posible_route)))
-        //             || mb_strpos($posible_route, $this->lazyUrlMatch);
-        //     },
-        //     ARRAY_FILTER_USE_KEY
-        // );
-        // foreach ($params_routes as $_route => $_) {
-        //     if (
-        //         mb_strpos($_route, $this->lazyUrlMatch) !== false
-        //         && \Helpers\Tools::startsWith(
-        //             ([$lazy_route, $lazy_param] = explode($this->lazyUrlMatch, $_route))[0],
-        //             $route
-        //         )
-        //     ) {
-        //         $_REQUEST[$lazy_param] = \Helpers\Tools::leftTrim($lazy_route, $route);
-        //         return $_route;
-        //     }
-        //     $_route = explode('/', $_route);
-        //     foreach ($_route as $index => $string) {
-        //         $is_param = substr($string, 0, 1) === $this->urlParamId;
-        //         if (
-        //             !$is_param
-        //             && $string !== $splited_route[$index]
-        //         ) break;
-
-        //         if ($is_param) {
-        //             $param = ltrim($string, $this->urlParamId);
-        //             if ($splited_route[$index] !== '')
-        //                 $_REQUEST[$param] = $splited_route[$index];
-        //             $splited_route[$index] = $string;
-        //         }
-        //     }
-        // }
-        // return implode('/', $splited_route);
         return [];
     }
     private function getRequestBody() {
@@ -115,7 +57,7 @@ class Router {
         return $_GET;
     }
     private function getResponse(\Http\Request $request): \Http\Response {
-        $response = new \Http\Response(OK, null);
+        $response = new \Http\Response;
         $controllers = $this->getControllers();
         try {
             foreach ($controllers as $controller) {
@@ -124,8 +66,8 @@ class Router {
             }
         } catch (\Exception $e) {
             $response
-                ->error($e->getMessage())
-                ->status(INTERNAL_SERVER_ERROR);
+                ->status(INTERNAL_SERVER_ERROR)
+                ->send($e->getMessage());
         }
         return $response;
     }

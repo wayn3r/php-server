@@ -2,15 +2,11 @@
 
 namespace User\Router;
 
-use \Http\Router;
+$router = new \Http\Router;
 
-$router = new Router;
-
-$router->use('/auth', function () {
-    echo 'adios';
-});
-$router->get('/auth', function () {
-    echo 'hola';
+$router->get('/auth', function (\Http\Request $req, \Http\Response $res) {
+    ['klk' => $klk] = $req->query();
+    $res->status(404)->json($klk);
 });
 
 return $router;

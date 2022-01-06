@@ -22,7 +22,7 @@ final class Server extends \Http\Router {
     private function NotFoundURL() {
         return function (\Http\Request $req, \Http\Response $res) {
             $res->status(NOT_FOUND)
-                ->send('Cannot ' . $req->method() . ' ' . $req->url());
+                ->send('Cannot ' . $req->method() . ' ' . $req->fullUrl());
         };
     }
 

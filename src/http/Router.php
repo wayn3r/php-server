@@ -2,11 +2,7 @@
 
 namespace Http;
 
-use function PHPSTORM_META\type;
-
 class Router {
-    private const URL_PARAM_ID = ':';
-    private string $requestedUrl;
     /** @var \Http\Route[]  */
     private array $routes = [];
 
@@ -15,16 +11,39 @@ class Router {
     }
 
     /** @return callable[] */
-    private function getControllers() {
+    private function getControllers(\Http\Request $request): array {
         $controllers = [];
-        $method = $_SERVER['REQUEST_METHOD'];
+        $method = $request->method();
+        $url = $request->url();
+
         foreach ($this->routes as $route) {
-            if ($route->match($method, $this->requestedUrl)) {
+            if ($route->match($method, $url)) {
+                $request->getParamsFromRoute($route);
+                $request->trimUrl($route->path());
                 $controllers = array_merge($controllers, $route->controllers());
             }
         }
         return $controllers;
     }
+    protected function getNextController(
+        array $controllers,
+        \Http\Request $request,
+        \Http\Response $response
+    ) {
+        return function (...$args) use ($controllers, $request, $response) {
+            $controller = current($controllers);
+            if (!$controller) return;
+            next($controllers);
+            $args = [
+                ...$args,
+                $request,
+                $response,
+                $this->getNextController($controllers, $request, $response)
+            ];
+            $controller(...$args);
+        };
+    }
+
     public function use($path, callable ...$controllers) {
         if (is_callable($path)) {
             $controllers = [$path, ...$controllers];
@@ -45,39 +64,22 @@ class Router {
         $this->setRoute(\Http\Route::PUT, $path, $controllers);
     }
 
-    private function getRequestParams() {
-        return [];
-    }
-    private function getRequestBody() {
-        // obteniendo los datos del cuerpo de la peticion
-        $body = json_decode(file_get_contents('php://input'), true) ?? [];
-        return array_merge($body, $_POST);
-    }
-    private function getRequestQuery() {
-        return $_GET;
-    }
-    private function getResponse(\Http\Request $request): \Http\Response {
-        $response = new \Http\Response;
-        $controllers = $this->getControllers();
+    public function __invoke(
+        \Http\Request $request,
+        \Http\Response $response,
+        ?callable $next = null
+    ): ?\Http\Response {
+        $controllers = $this->getControllers($request);
+        if (!$controllers) {
+            return $next ? $next() : null;
+        }
         try {
-            foreach ($controllers as $controller) {
-                $exit = $controller($request, $response);
-                if ($exit) break;
-            }
+            $this->getNextController($controllers, $request, $response)();
         } catch (\Exception $e) {
             $response
                 ->status(INTERNAL_SERVER_ERROR)
                 ->send($e->getMessage());
         }
         return $response;
-    }
-
-    public function start(string $url): \Http\Response {
-        $this->requestedUrl = $url;
-        $params = $this->getRequestParams();
-        $query = $this->getRequestQuery();
-        $body = $this->getRequestBody();
-        $request = new \Http\Request($params, $body, $query);
-        return $this->getResponse($request);
     }
 }

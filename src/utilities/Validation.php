@@ -60,3 +60,19 @@ abstract class Validation {
         throw new \Exception("[{$regex}] no esta definido, definalo si desea usarlo");
     }
 }
+
+class ValidationError {
+    public string $prop;
+    public string $message;
+    public string $location;
+
+    public function __construct(
+        ?string $prop,
+        string $message,
+        string $location
+    ) {
+        $this->prop = $prop;
+        $this->message = $message;
+        $this->location = $location;
+    }
+}

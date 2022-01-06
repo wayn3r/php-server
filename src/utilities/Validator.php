@@ -123,12 +123,6 @@ class Validator {
     public function blacklist(array $blackList, array $config = []) {
         return $this->add((new \Utilities\Validation\BlackList($blackList))->config($config));
     }
-    public function exists(\Core\Model $model, array $config = []) {
-        return $this->add((new \Utilities\Validation\Exists($model))->config($config));
-    }
-    public function notExists(\Core\Model $model, array $config = []) {
-        return $this->add((new \Utilities\Validation\NotExists($model))->config($config));
-    }
     public function password(array $config = []) {
         return $this->add((new \Utilities\Validation\Password)->config($config));
     }
@@ -140,5 +134,32 @@ class Validator {
     }
     public function max(string $max, array $config = []) {
         return $this->add((new \Utilities\Validation\Max($max))->config($config));
+    }
+
+    public function param(string $param): callable {
+        $validators = $this->validators;
+        $this->clearValidators();
+        return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
+            $this->validators = $validators;
+            $this->check($request->params(), $param, false);
+            $next();
+        };
+    }
+    public function body(string $param): callable {
+        $validators = $this->validators;
+        $this->clearValidators();
+        return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
+            $this->validators = $validators;
+            $this->check($request->body(), $param, false);
+            $next();
+        };
+    }
+
+    public function checkout() {
+        return function ($_, \Http\Response $res, callable $next) {
+            if ($errors = $this->errors())
+                return $res->status(BAD_REQUEST)->json($errors);
+            $next();
+        };
     }
 }

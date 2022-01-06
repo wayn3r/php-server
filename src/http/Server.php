@@ -2,42 +2,36 @@
 
 namespace Http;
 
-class Server {
+final class Server extends \Http\Router {
     private static \Http\Server $server;
-    private array $routers;
-    private const QUERY_START_STRING = '?';
 
     private function __construct() {
-        $this->routers = [];
     }
-    private function sanitize(string $url) {
-        $url = strtolower($url);
-        $filteredUrl = filter_var($url, FILTER_SANITIZE_URL);
-        return explode(self::QUERY_START_STRING, $filteredUrl)[0];
-    }
+
     public static function getServer(): \Http\Server {
         return self::$server ??= new \Http\Server;
     }
-    public function use(string $baseURL, \Http\Router $router): void {
-        $this->routers[$baseURL] = $router;
+    private function getRequestBody() {
+        // obteniendo los datos del cuerpo de la peticion
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        return array_merge($body, $_POST);
+    }
+    private function getRequestQuery() {
+        return $_GET;
+    }
+    private function NotFoundURL() {
+        return function (\Http\Request $req, \Http\Response $res) {
+            $res->status(NOT_FOUND)
+                ->send('Cannot ' . $req->method() . ' ' . $req->url());
+        };
     }
 
-    public function start() {
-        $url = $this->sanitize($_SERVER['REQUEST_URI']);
-        if ($router = $this->getRouter($url)) {
-            ob_start();
-            $router->start($url);
-            ob_end_flush();
-        }
-    }
-
-    public function getRouter(string &$requestUrl): ?\Http\Router {
-        foreach ($this->routers as $url => $router) {
-            if (strpos($requestUrl, $url) === 0) {
-                $requestUrl = substr($requestUrl, strlen($url));
-                return $router;
-            }
-        }
-        return null;
+    public function start(): void {
+        $this->use($this->NotFoundURL());
+        $query = $this->getRequestQuery();
+        $body = $this->getRequestBody();
+        $request = new \Http\Request($body, $query);
+        $response = new \Http\Response;
+        $this->__invoke($request, $response);
     }
 }

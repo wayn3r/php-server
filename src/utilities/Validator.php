@@ -142,6 +142,17 @@ class Validator {
         return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
             $this->validators = $validators;
             $this->check($request->params(), $param, false);
+            $request->validator = $this;
+            $next();
+        };
+    }
+    public function query(string $param): callable {
+        $validators = $this->validators;
+        $this->clearValidators();
+        return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
+            $this->validators = $validators;
+            $this->check($request->query(), $param, false);
+            $request->validator = $this;
             $next();
         };
     }
@@ -151,13 +162,21 @@ class Validator {
         return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
             $this->validators = $validators;
             $this->check($request->body(), $param, false);
+            $request->validator = $this;
             $next();
         };
     }
 
     public function checkout() {
-        return function ($_, \Http\Response $res, callable $next) {
-            if ($errors = $this->errors())
+        return function (
+            \Http\Request $req,
+            \Http\Response $res,
+            callable $next
+        ) {
+            if (
+                $req->validator instanceof \Utilities\Validator
+                && $errors = $req->validator->errors()
+            )
                 return $res->status(BAD_REQUEST)->json($errors);
             $next();
         };

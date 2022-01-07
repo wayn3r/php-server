@@ -5,6 +5,6 @@ $userRouter = require_once('user/router/router.php');
 // Procesando la peticion y devolviendo la respuesta
 $app = \Http\Server::getServer();
 
-$app->use('/user/:id/auth/:type', $userRouter);
+$app->use('/user', $userRouter);
 
 $app->start();

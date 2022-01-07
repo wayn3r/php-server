@@ -16,7 +16,7 @@ final class Route {
     private string $method;
     private array $params;
     private string $path;
-
+    private bool $hasRouter;
     private string $urlMatchRegex;
 
     public function __construct(
@@ -26,12 +26,21 @@ final class Route {
     ) {
         $this->method = $method;
         $this->path = str_replace('/', '\/', $path);
-        $this->controllers = $controllers;
         $this->setParams();
+        $this->controllers = $controllers;
 
-        $this->urlMatchRegex = "/^{$this->path}(\/.*)?$/";
+        $this->setHasRouter();
+
+        $this->urlMatchRegex = $this->hasRouter
+            ? "/^{$this->path}(\/.*)?$/"
+            : "/^{$this->path}$/";
     }
-
+    private function setHasRouter(): void {
+        $this->hasRouter = \Helpers\Tools::Some(
+            fn ($controller) => $controller instanceof \Http\Router,
+            $this->controllers
+        );
+    }
     private function setParams() {
         $id = self::URL_PARAM_ID;
         $regex = "/(?<=\/){$id}[^\/\\\]+/";
@@ -67,15 +76,16 @@ final class Route {
     public function getParamsFromUrl(string $url): array {
         preg_match_all($this->urlMatchRegex, $url, $matches);
         if (!$matches) return [];
+
         array_shift($matches);
-        array_pop($matches);
+        if ($this->hasRouter)
+            array_pop($matches);
         $matches = array_merge(...$matches);
         foreach ($this->params as $key => $param) {
             $param = ltrim($param, self::URL_PARAM_ID);
             $matches[$param] = $matches[$key];
             unset($matches[$key]);
         }
-
         return $matches;
     }
 }

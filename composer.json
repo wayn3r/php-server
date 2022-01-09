@@ -1,6 +1,6 @@
 {
     "name": "wayn3r/php-server",
-    "description": "Estructura de un servidor de PHP para creaci\u0000n de REST APIs",
+    "description": "Servidor de PHP para creación de APIs basado en express.js",
     "type": "project",
     "license": "MIT",
     "authors": [

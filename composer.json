@@ -13,7 +13,7 @@
     ],
     "require": {},
     "scripts": {
-        "start": "php -S localhost:8000 -c php.ini src/index.php",
+        "start": "php -S localhost:8000 -c php.ini index.php",
         "start:dev": "composer dump && composer start"
     },
     "autoload": {

@@ -8,6 +8,7 @@ class Validator {
     public bool $clearValidatorsAfterCheck = true;
     private array $errors = [];
     protected array $validators = [];
+    private string $location;
 
     private function validate(string $prop) {
         $cast = function (\Validate\Validation $validation) {
@@ -24,7 +25,7 @@ class Validator {
                     $validation->types
                 )
             )
-                $type_error = '. Tipo de dato incorrecto, se esperaba [' . implode(', ', $validation->types) . "] y se recibió [{$type}]";
+                $type_error = 'Tipo de dato incorrecto, se esperaba [' . implode(', ', $validation->types) . "] y se recibió [{$type}]";
 
             $must_validate = $validation->strict || isset($this->value);
             if (
@@ -49,7 +50,12 @@ class Validator {
                 $validation->message
             );
 
-            $this->errors[] = "[{$prop}]" . $message . $type_error;
+            $this->errors[] = new \Validate\ValidationError(
+                $prop, 
+                $message,
+                $type_error ?? null, 
+                $this->location ?? null
+            );
             if ($validation->stop) break;
         }
     }
@@ -176,8 +182,11 @@ class Validator {
             if (
                 $req->validator instanceof \Validate\Validator
                 && $errors = $req->validator->errors()
-            )
-                return $res->status(BAD_REQUEST)->json($errors);
+            ){
+                return $res->status(400)->json([
+                    'error' => $errors
+                ]);
+            }
             $next();
         };
     }

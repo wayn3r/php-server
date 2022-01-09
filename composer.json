@@ -1,7 +1,8 @@
 {
     "name": "wayn3r/php-server",
     "description": "Servidor de PHP para creación de APIs basado en express.js",
-    "type": "project",
+    "type": "library",
+    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {

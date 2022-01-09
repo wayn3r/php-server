@@ -36,7 +36,7 @@ final class Route {
             : "/^{$this->path}$/";
     }
     private function setHasRouter(): void {
-        $this->hasRouter = \Helpers\Tools::Some(
+        $this->hasRouter = \Helpers\Arrays::Some(
             fn ($controller) => $controller instanceof \Http\Router,
             $this->controllers
         );

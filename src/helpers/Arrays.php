@@ -2,7 +2,7 @@
 
 namespace Helpers;
 
-trait ArrayFunctions {
+final class Arrays {
 
     static function Some(callable $callback, array $haystack): bool {
         foreach ($haystack as $key => $value)

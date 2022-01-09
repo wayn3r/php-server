@@ -2,7 +2,7 @@
 
 namespace Helpers;
 
-trait StringFunctions {
+final class Strings {
 
     static function cleanLineBreaks(string $text, bool $strict = true): string {
         $text_array = explode("\n", $text);

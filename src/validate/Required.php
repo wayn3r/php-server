@@ -1,12 +1,12 @@
 <?php
 
-namespace Utilities\Validation;
+namespace Validate;
 
-class Required extends \Utilities\Validation {
+class Required extends \Validate\Validation {
     public bool $strict = true;
     public bool $stop = true;
     public string $message = ' Es requerido';
-    public function validate(\Utilities\Validator $validator): bool {
+    public function validate(\Validate\Validator $validator): bool {
         return isset($validator->value);
     }
 }

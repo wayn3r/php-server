@@ -77,7 +77,7 @@ class Router {
             $this->getNextController($controllers, $request, $response)();
         } catch (\Exception $e) {
             $response
-                ->status(INTERNAL_SERVER_ERROR)
+                ->status(500)
                 ->send($e->getMessage());
         }
         return $response;

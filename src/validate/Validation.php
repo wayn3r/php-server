@@ -1,6 +1,6 @@
 <?php
 
-namespace Utilities;
+namespace Validate;
 
 abstract class Validation {
 
@@ -41,7 +41,7 @@ abstract class Validation {
             $vtype = gettype($value);
             if (
                 !$property->hasType()
-                || \Helpers\Tools::startsWith($ptype, $vtype)
+                || \Helpers\Strings::startsWith($ptype, $vtype)
                 || ($vtype === 'double' && $ptype === 'float')
             )
                 $this->$atrribute = $value;
@@ -53,7 +53,7 @@ abstract class Validation {
      * @return bool
      * Devuelve True si pasa la validación de lo contrario False
      */
-    public abstract function validate(\Utilities\Validator $validator): bool;
+    public abstract function validate(\Validate\Validator $validator): bool;
     public function regex(string $regex): string {
         if (isset($this->regexs[$regex]))
             return $this->regexs[$regex];

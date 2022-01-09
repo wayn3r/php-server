@@ -1,13 +1,13 @@
 <?php
 
-namespace Utilities\Validation;
+namespace Validate;
 
-class WhiteList extends \Utilities\Validation {
+class WhiteList extends \Validate\Validation {
     private array $whiteList;
     public function __construct(array $whiteList) {
         $this->whiteList = $whiteList;
     }
-    public function validate(\Utilities\Validator $validator): bool {
+    public function validate(\Validate\Validator $validator): bool {
         return in_array($validator->value, $this->whiteList);
     }
 }

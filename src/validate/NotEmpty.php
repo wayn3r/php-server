@@ -1,11 +1,11 @@
 <?php
 
-namespace Utilities\Validation;
+namespace Validate;
 
-class NotEmpty extends \Utilities\Validation {
+class NotEmpty extends \Validate\Validation {
     public bool $stop = true;
     public string $message = ' No puede estar vacio';
-    public function validate(\Utilities\Validator $validator): bool {
+    public function validate(\Validate\Validator $validator): bool {
         return !empty(is_string($validator->value)
             ? trim($validator->value)
             : $validator->value);

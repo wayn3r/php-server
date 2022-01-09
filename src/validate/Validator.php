@@ -1,6 +1,6 @@
 <?php
 
-namespace Utilities;
+namespace Validate;
 
 class Validator {
     public $value;
@@ -10,7 +10,7 @@ class Validator {
     protected array $validators = [];
 
     private function validate(string $prop) {
-        $cast = function (\Utilities\Validation $validation) {
+        $cast = function (\Validate\Validation $validation) {
             return $validation;
         };
         foreach ($this->validators as $validation) {
@@ -69,7 +69,7 @@ class Validator {
         unset($this->prop);
         return $this;
     }
-    public function add(\Utilities\Validation $validation) {
+    public function add(\Validate\Validation $validation) {
         $this->validators[get_class($validation)] = $validation;
         return $this;
     }
@@ -88,52 +88,52 @@ class Validator {
         return $errors;
     }
     public function required(array $config = []) {
-        return $this->add((new \Utilities\Validation\Required)->config($config));
+        return $this->add((new \Validate\Required)->config($config));
     }
     public function notEmpty(array $config = []) {
-        return $this->add((new \Utilities\Validation\NotEmpty)->config($config));
+        return $this->add((new \Validate\NotEmpty)->config($config));
     }
     public function email(array $config = []) {
-        return $this->add((new \Utilities\Validation\Email)->config($config));
+        return $this->add((new \Validate\Email)->config($config));
     }
     public function phone(array $config = []) {
-        return $this->add((new \Utilities\Validation\Phone)->config($config));
+        return $this->add((new \Validate\Phone)->config($config));
     }
     public function date(array $config = []) {
-        return $this->add((new \Utilities\Validation\Date)->config($config));
+        return $this->add((new \Validate\Date)->config($config));
     }
     public function time(array $config = []) {
-        return $this->add((new \Utilities\Validation\Time)->config($config));
+        return $this->add((new \Validate\Time)->config($config));
     }
     public function datetime(array $config = []) {
-        return $this->add((new \Utilities\Validation\DateTime)->config($config));
+        return $this->add((new \Validate\DateTime)->config($config));
     }
     public function number(array $config = []) {
-        return $this->add((new \Utilities\Validation\Number)->config($config));
+        return $this->add((new \Validate\Number)->config($config));
     }
     public function minLength(int $length, array $config = []) {
-        return $this->add((new \Utilities\Validation\MinLength($length))->config($config));
+        return $this->add((new \Validate\MinLength($length))->config($config));
     }
     public function maxLength(int $length, array $config = []) {
-        return $this->add((new \Utilities\Validation\MaxLength($length))->config($config));
+        return $this->add((new \Validate\MaxLength($length))->config($config));
     }
     public function whitelist(array $whiteList, array $config = []) {
-        return $this->add((new \Utilities\Validation\whitelist($whiteList))->config($config));
+        return $this->add((new \Validate\whitelist($whiteList))->config($config));
     }
     public function blacklist(array $blackList, array $config = []) {
-        return $this->add((new \Utilities\Validation\BlackList($blackList))->config($config));
+        return $this->add((new \Validate\BlackList($blackList))->config($config));
     }
     public function password(array $config = []) {
-        return $this->add((new \Utilities\Validation\Password)->config($config));
+        return $this->add((new \Validate\Password)->config($config));
     }
     public function array(array $config = []) {
-        return $this->add((new \Utilities\Validation\IsArray)->config($config));
+        return $this->add((new \Validate\IsArray)->config($config));
     }
     public function min(string $min, array $config = []) {
-        return $this->add((new \Utilities\Validation\Min($min))->config($config));
+        return $this->add((new \Validate\Min($min))->config($config));
     }
     public function max(string $max, array $config = []) {
-        return $this->add((new \Utilities\Validation\Max($max))->config($config));
+        return $this->add((new \Validate\Max($max))->config($config));
     }
 
     public function param(string $param): callable {
@@ -174,7 +174,7 @@ class Validator {
             callable $next
         ) {
             if (
-                $req->validator instanceof \Utilities\Validator
+                $req->validator instanceof \Validate\Validator
                 && $errors = $req->validator->errors()
             )
                 return $res->status(BAD_REQUEST)->json($errors);

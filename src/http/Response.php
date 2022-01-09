@@ -28,10 +28,9 @@ final class Response {
     }
     public function send($data) {
         echo $data;
-        return $this;
     }
     public function json($data) {
         $this->contentType('application/json');
-        return $this->send(json_encode($data, JSON_UNESCAPED_UNICODE));
+        $this->send(json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 }

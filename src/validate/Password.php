@@ -1,14 +1,14 @@
 <?php
 
-namespace Utilities\Validation;
+namespace Validate;
 
-class Password extends \Utilities\Validation {
+class Password extends \Validate\Validation {
     private int $passwordMinLength = 4;
     private int $passwordMaxLength = 16;
     public array $types = ['string'];
     public string $message = 'El password no es válido';
 
-    public function validate(\Utilities\Validator $validator): bool {
+    public function validate(\Validate\Validator $validator): bool {
         $password = $validator->value;
         $passLength = mb_strlen($password);
 

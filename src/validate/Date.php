@@ -1,11 +1,11 @@
 <?php
 
-namespace Utilities\Validation;
+namespace Validate;
 
-class Date extends \Utilities\Validation {
+class Date extends \Validate\Validation {
     public array $types = ['string'];
     public string $message = '{[?]} No es una fecha válida';
-    public function validate(\Utilities\Validator $validator): bool {
+    public function validate(\Validate\Validator $validator): bool {
         $date = explode('-', $validator->value);
         if (
             count($date) !== 3

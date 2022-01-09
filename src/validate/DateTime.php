@@ -1,11 +1,11 @@
 <?php
 
-namespace Utilities\Validation;
+namespace Validate;
 
-class DateTime extends \Utilities\Validation {
+class DateTime extends \Validate\Validation {
     public array $types = ['string'];
     public string $message = '{[?]} No es una fecha y hora válida';
-    public function validate(\Utilities\Validator $validator): bool {
+    public function validate(\Validate\Validator $validator): bool {
         [$date, $time] = explode(' ', $validator->value);
         $date = explode('-', $date);
 

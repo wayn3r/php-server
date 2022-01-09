@@ -15,7 +15,7 @@ $app = \Http\Server::getServer();
 
 $app->get('/', 
     function(\Http\Request $req, \Http\Response $res){
-        $res->send('Hello world')
+        $res->send('Hello world');
     }
 );
 
@@ -42,12 +42,14 @@ Puedes hacer uso de rutas relativas creando instancias de \Http\Router y usandol
 
 En fichero router.php
 ```
+<?php
+
 $router = new \Http\Router;
 
 $router->get('/', function(\Http\Request $req, \Http\Response $res){
     $res->json([
         'message' => 'Hello world from user router'
-    ])
+    ]);
 });
 
 return $router;
@@ -59,7 +61,7 @@ En el index.php
 
 require_once  <project-root> '/vendor/autoload.php';
 
-$userRouter = require('router.php')
+$userRouter = require('router.php');
 
 $app = \Http\Server::getServer();
 
@@ -73,6 +75,8 @@ $app->start();
 
 Para acceder a los Query Params y a los parametros pasados en el cuerpo de la petición, el \Http\Request cuenta con dos metodos query() y body():
 ```
+<?php
+
 $router = new \Http\Router;
 
 $router->get('/', function(\Http\Request $req, \Http\Response $res){
@@ -81,13 +85,15 @@ $router->get('/', function(\Http\Request $req, \Http\Response $res){
     $res->json([
         'query' => $query,
         'body' => $body
-    ])
+    ]);
 });
 
 return $router;
 ```
 Tambien puedes recibir datos por la url de forma similar a como lo hace express
 ```
+<?php
+
 $router = new \Http\Router;
 
 $router->get('/:id', function(\Http\Request $req, \Http\Response $res){
@@ -116,6 +122,8 @@ Este callable puede recibir tantos parametros como el usuario quiera y seran pas
 Esto es importante porque pasar parametros o no a la funcion next cambiara el orden de los parametros recibidos en el siguiente controlador, veamos un ejemplo:
 
 ```
+<?php
+
 $router = new \Http\Router;
 
 $router->get('/', function(\Http\Request $req, \Http\Response $res, callable $next){
@@ -134,9 +142,9 @@ $router->post('/', function(\Http\Request $req, \Http\Response $res, callable $n
     ]);
 });
 
-$router->use(function($errors, $_, \Http\Response $res){
+$router->use('/', function($errors, $_, \Http\Response $res){
     $res->status(400)->json([
-        'error' => $errors;
+        'error' => $errors
     ]);
 });
 
@@ -144,21 +152,24 @@ return $router;
 ```
 Igual que en express tambien se pueden agregar middlewares a nivel de petición.
 ```
+<?php
+
 $router = new \Http\Router;
 
 $router->get('/', 
-    function(\Http\Request $req, \Http\Response $res, $next){
+    function(\Http\Request $req, \Http\Response $res, callable $next){
         $id = $req->query()['id'];
         if(!$id || !is_numeric($id)) 
             return $res->status(400)->json([
                 'error' => 'ID invalido'
             ]); 
-        $req->user = $db->findUser($id);
+        $req->id = intval($id);
+        $next();
     },
     function(\Http\Request $req, \Http\Response $res){
-        $user = $req->user;
+        $id = $req->id;
         $res->json([
-            'user' => $user
+            'id' => $id
         ]);
     }
 );
@@ -173,17 +184,19 @@ php-server ya viene con algunos middlewares para validar parecidos al funcionami
 
 Nota: Esta caracteristica aun esta en desarrollo.
 ```
+<?php
+
 $router = new \Http\Router;
 
 $validator = new \Validate\Validator;
 
 $router->get('/', 
-    $validator->required()->notEmpty()->query('id'),
+    $validator->required()->number()->query('id'),
     $validator->checkout(),
     function(\Http\Request $req, \Http\Response $res){
-        $user = $db->findUser($req->query()['id']);
+        $id = intval($req->query()['id']);
         $res->json([
-            'user' => $user
+            'id' => $id
         ]);
     }
 );

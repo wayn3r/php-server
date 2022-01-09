@@ -16,9 +16,14 @@ final class Request {
         $this->params = [];
         $this->body = $body;
         $this->query = $query;
-        $this->fullUrl = $this->sanitize($_SERVER['REQUEST_URI']);
+        $this->fullUrl = $this->getUrl();
         $this->url = $this->fullUrl;
         $this->method = $_SERVER['REQUEST_METHOD'];
+    }
+    private function getUrl():string {
+        $fileRelativeRoot = rtrim(dirname($_SERVER['PHP_SELF']), '/');
+        $url = \Helpers\Strings::leftTrim($fileRelativeRoot, $_SERVER['REQUEST_URI']);
+        return $this->sanitize($url);
     }
     private function sanitize(string $url) {
         $url = strtolower($url);

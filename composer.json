@@ -3,6 +3,7 @@
     "description": "Servidor de PHP para creación de APIs basado en express.js",
     "type": "library",
     "version": "1.0.0",
+    "minimum-stability": "stable",
     "license": "MIT",
     "authors": [
         {

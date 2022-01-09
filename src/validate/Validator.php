@@ -7,15 +7,12 @@ class Validator {
     public string $prop;
     public bool $clearValidatorsAfterCheck = true;
     private array $errors = [];
+    /** @var \Validate\Validation[] */
     protected array $validators = [];
     private string $location;
 
     private function validate(string $prop) {
-        $cast = function (\Validate\Validation $validation) {
-            return $validation;
-        };
         foreach ($this->validators as $validation) {
-            $validation =  $cast($validation);
             $type_error = '';
             if (
                 isset($this->value)
@@ -147,6 +144,7 @@ class Validator {
         $this->clearValidators();
         return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
             $this->validators = $validators;
+            $this->location = 'params';
             $this->check($request->params(), $param, false);
             $request->validator = $this;
             $next();
@@ -157,6 +155,7 @@ class Validator {
         $this->clearValidators();
         return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
             $this->validators = $validators;
+            $this->location = 'query';
             $this->check($request->query(), $param, false);
             $request->validator = $this;
             $next();
@@ -167,6 +166,7 @@ class Validator {
         $this->clearValidators();
         return function (\Http\Request $request, $_, callable $next) use ($param, $validators) {
             $this->validators = $validators;
+            $this->location = 'body'; 
             $this->check($request->body(), $param, false);
             $request->validator = $this;
             $next();

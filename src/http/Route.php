@@ -25,15 +25,25 @@ final class Route {
         array $controllers
     ) {
         $this->method = $method;
-        $this->path = str_replace('/', '\/', $path);
-        $this->setParams();
         $this->controllers = $controllers;
-
+        $this->setPath($path);
+        $this->setParams();
         $this->setHasRouter();
-
         $this->urlMatchRegex = $this->hasRouter
             ? "/^{$this->path}(\/.*)?$/"
             : "/^{$this->path}$/";
+    }
+    private function setPath(string $path) {
+        if (
+            $path !== self::ALL &&
+            !\Helpers\Strings::startsWith('/', $path)
+        ) {
+            $path = $path === ''
+                ? 'Empty string'
+                : $path;
+            throw new \Http\UrlException("All paths must start with / [{$path}] recieved");
+        }
+        $this->path = str_replace('/', '\/', $path);
     }
     private function setHasRouter(): void {
         $this->hasRouter = \Helpers\Arrays::Some(
@@ -55,7 +65,7 @@ final class Route {
         return $this->path === self::ALL
             || (bool)preg_match(
                 $this->urlMatchRegex,
-                $url
+                $url ?: '/'
             );
     }
 

@@ -20,10 +20,12 @@ final class Request {
         $this->url = $this->fullUrl;
         $this->method = $_SERVER['REQUEST_METHOD'];
     }
-    private function getUrl():string {
-        $fileRelativeRoot = rtrim(dirname($_SERVER['PHP_SELF']), '/');
-        $url = \Helpers\Strings::leftTrim($fileRelativeRoot, $_SERVER['REQUEST_URI']);
-        return $this->sanitize($url);
+    private function getUrl(): string {
+        @[
+            'REDIRECT_REQUEST_URI' => $redirected,
+            'REQUEST_URI' => $uri
+        ] = $_SERVER;
+        return $this->sanitize($redirected ?? $uri);
     }
     private function sanitize(string $url) {
         $url = strtolower($url);

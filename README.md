@@ -33,7 +33,7 @@ Si usas Apache puedes conseguir esto a traves del archivo .htaccess
 ```
 RewriteEngine on
 
-RewriteRule ^(.*)$ index.php [L,QSA]
+RewriteRule ^(.*)$ index.php [L,QSA,E=REQUEST_URI:/$1]
 ```
 
 ## Rutas relativas

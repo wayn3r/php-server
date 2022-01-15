@@ -11,19 +11,25 @@
             "email": "w9delacruz@gmail.com"
         }
     ],
-    "require": {},
     "scripts": {
-        "start": "php -S localhost:8000 -c php.ini index.php",
-        "start:dev": "composer dump && composer start"
+        "start": "php -S localhost:8000 -c src/index.php",
+        "start:dev": "composer dump && composer start",
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html=coverage",
+        "lint": "phpcs --standard=Squiz src/ -s",
+        "lint:fix": "phpbcf src"
     },
     "autoload": {
-        "psr-4": {
-            "Http\\": "src/http/",
-            "Helpers\\": "src/helpers/",
-            "Validate\\": "src/validate/"
-        }        
+       "classmap": [
+           "src"
+       ]        
     },
     "config": {
         "process-timeout": 0
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.6.2",
+        "phpunit/phpunit": "^9.5.11"
     }
+  
 }

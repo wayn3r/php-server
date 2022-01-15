@@ -18,14 +18,14 @@ final class Request {
         $this->query = $query;
         $this->fullUrl = $this->getUrl();
         $this->url = $this->fullUrl;
-        $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
     }
     private function getUrl(): string {
         @[
             'REDIRECT_REQUEST_URI' => $redirected,
             'REQUEST_URI' => $uri
         ] = $_SERVER;
-        return $this->sanitize($redirected ?? $uri);
+        return $this->sanitize($redirected ?? $uri ?? '');
     }
     private function sanitize(string $url) {
         $url = strtolower($url);

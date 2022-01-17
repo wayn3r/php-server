@@ -4,32 +4,43 @@ namespace Helpers;
 
 final class Arrays {
 
-    static function Some(callable $callback, array $haystack): bool {
-        foreach ($haystack as $key => $value)
-            if ($callback($value, $key))
+    public static function some(callable $callback, array $haystack): bool {
+        foreach ($haystack as $key => $value) {
+            if ($callback($value, $key)) {
                 return true;
+            }
+        }
+
         return false;
     }
 
-    static function Find(callable $callback, array $haystack) {
-        foreach ($haystack as $key => $value)
-            if ($callback($value, $key))
+    public static function find(callable $callback, array $haystack) {
+        foreach ($haystack as $key => $value) {
+            if ($callback($value, $key)) {
                 return $value;
+            }
+        }
+
         return false;
     }
 
-    static function MapFilter(callable $callback, array $haystack): array {
+    public static function mapFilter(callable $callback, array $haystack): array {
         $result = [];
-        foreach ($haystack as $key => $value)
-            if (($value = $callback($value, $key)) !== null)
+        foreach ($haystack as $key => $value) {
+            $value = $callback($value, $key);
+            if ($value !== null) {
                 $result[] = $value;
+            }
+        }
+
         return $result;
     }
 
-    static function objectToArray(object $object): array {
+    public static function objectToArray(object $object): array {
         if (!is_object($object) && !is_array($object)) {
             return $object;
         }
+
         return json_decode(json_encode($object), true);
     }
 }

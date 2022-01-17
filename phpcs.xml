@@ -5,8 +5,6 @@
     <arg name='colors'/>
     <arg name='parallel' value='75'/>
 
-    <exclude-pattern type="relative">^(?!old-api).+</exclude-pattern>
-
     <rule ref='Squiz' >
         <exclude name='Squiz.Commenting.ClosingDeclarationComment'/>
         <exclude name='Squiz.Commenting.ClassComment'/>
@@ -26,7 +24,7 @@
         <exclude name='Squiz.PHP.DisallowInlineIf'/>
         <exclude name='Squiz.PHP.DisallowBooleanStatement'/>
         <exclude name='Squiz.PHP.Heredoc'/>
-        <!-- <exclude name='Squiz.Arrays.ArrayDeclaration.DoubleArrowNotAligned'/> -->
+        <exclude name='Squiz.Arrays.ArrayDeclaration.DoubleArrowNotAligned'/>
         <exclude name='Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed'/>
         <exclude name='Squiz.Commenting.BlockComment.WrongStart'/>
         <exclude name='Squiz.Objects.ObjectInstantiation.NotAssigned'/>

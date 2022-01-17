@@ -14,5 +14,4 @@ class ServerTest extends TestCase {
         $server = \Http\Server::getServer();
         $this->assertEquals($server, \Http\Server::getServer());
     }
-
 }

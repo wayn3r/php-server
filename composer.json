@@ -16,8 +16,8 @@
         "start:dev": "composer dump && composer start",
         "test": "phpunit",
         "test:coverage": "phpunit --coverage-html=coverage",
-        "lint": "phpcs --standard=Squiz src/ -s",
-        "lint:fix": "phpbcf src"
+        "lint": "phpcs src/ -s",
+        "lint:fix": "phpcbf src/"
     },
     "autoload": {
        "classmap": [

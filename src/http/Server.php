@@ -3,6 +3,7 @@
 namespace Http;
 
 final class Server extends \Http\Router {
+
     private static \Http\Server $server;
 
     private function __construct() {
@@ -11,15 +12,18 @@ final class Server extends \Http\Router {
     public static function getServer(): \Http\Server {
         return self::$server ??= new \Http\Server;
     }
+
     private function getRequestBody() {
         // obteniendo los datos del cuerpo de la peticion
-        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $body = (json_decode(file_get_contents('php://input'), true) ?? []);
         return array_merge($body, $_POST);
     }
+
     private function getRequestQuery() {
         return $_GET;
     }
-    private function NotFoundURL() {
+
+    private function notFoundURL() {
         return function (\Http\Request $req, \Http\Response $res) {
             $res->status(404)
                 ->send('Cannot ' . $req->method() . ' ' . $req->fullUrl());
@@ -27,7 +31,7 @@ final class Server extends \Http\Router {
     }
 
     public function start(): void {
-        $this->use($this->NotFoundURL());
+        $this->use($this->notFoundURL());
         $query = $this->getRequestQuery();
         $body = $this->getRequestBody();
         $request = new \Http\Request($body, $query);

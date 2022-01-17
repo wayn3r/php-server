@@ -3,11 +3,17 @@
 namespace Http;
 
 final class Request {
+
     private array $params;
+
     private array $body;
+
     private array $query;
+
     private string $fullUrl;
+
     private string $url;
+
     private string $method;
 
     private const QUERY_START_STRING = '?';
@@ -18,42 +24,53 @@ final class Request {
         $this->query = $query;
         $this->fullUrl = $this->getUrl();
         $this->url = $this->fullUrl;
-        $this->method = $_SERVER['REQUEST_METHOD'] ?? '';
+        $this->method = ($_SERVER['REQUEST_METHOD'] ?? '');
     }
+
     private function getUrl(): string {
         @[
             'REDIRECT_REQUEST_URI' => $redirected,
-            'REQUEST_URI' => $uri
+            'REQUEST_URI'          => $uri,
         ] = $_SERVER;
-        return $this->sanitize($redirected ?? $uri ?? '');
+        return $this->sanitize(($redirected ?? $uri ?? ''));
     }
+
     private function sanitize(string $url) {
         $url = strtolower($url);
         $filteredUrl = filter_var($url, FILTER_SANITIZE_URL);
         return explode(self::QUERY_START_STRING, $filteredUrl)[0];
     }
+
     public function params() {
         return $this->params;
     }
+
     public function getParamsFromRoute(\Http\Route $route) {
         $this->params = array_merge($this->params, $route->getParamsFromUrl($this->url));
     }
+
     public function body() {
         return $this->body;
     }
+
     public function query() {
         return $this->query;
     }
+
     public function url() {
         return $this->url;
     }
+
     public function method(): string {
         return $this->method;
     }
+
     public function fullUrl() {
         return $this->fullUrl;
     }
+
     public function trimUrl(string $partialUrl) {
-        return $this->url = preg_replace("/^{$partialUrl}/", '', $this->url);
+        $this->url = preg_replace("/^{$partialUrl}/", '', $this->url);
+        return $this->url;
     }
 }

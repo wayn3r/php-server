@@ -3,6 +3,7 @@
 namespace Http;
 
 class Router {
+
     /** @var \Http\Route[]  */
     private array $routes = [];
 
@@ -23,8 +24,10 @@ class Router {
                 $controllers = array_merge($controllers, $route->controllers());
             }
         }
+
         return $controllers;
     }
+
     protected function getNextController(
         array $controllers,
         \Http\Request $request,
@@ -32,13 +35,16 @@ class Router {
     ) {
         return function (...$args) use ($controllers, $request, $response) {
             $controller = current($controllers);
-            if (!$controller) return;
+            if (!$controller) {
+                return;
+            }
+
             next($controllers);
             $args = [
                 ...$args,
                 $request,
                 $response,
-                $this->getNextController($controllers, $request, $response)
+                $this->getNextController($controllers, $request, $response),
             ];
             $controller(...$args);
         };
@@ -49,17 +55,22 @@ class Router {
             $controllers = [$path, ...$controllers];
             $path = \Http\Route::ALL;
         }
+
         $this->setRoute(\Http\Route::ALL, $path, $controllers);
     }
+
     public function post(string $path, callable ...$controllers) {
         $this->setRoute(\Http\Route::POST, $path, $controllers);
     }
+
     public function get(string $path, callable ...$controllers) {
         $this->setRoute(\Http\Route::GET, $path, $controllers);
     }
+
     public function delete(string $path, callable ...$controllers) {
         $this->setRoute(\Http\Route::DELETE, $path, $controllers);
     }
+
     public function put(string $path, callable ...$controllers) {
         $this->setRoute(\Http\Route::PUT, $path, $controllers);
     }
@@ -71,8 +82,9 @@ class Router {
     ): ?\Http\Response {
         $controllers = $this->getControllers($request);
         if (!$controllers) {
-            return $next ? $next() : null;
+            return ($next) ? $next() : null;
         }
+
         try {
             $this->getNextController($controllers, $request, $response)();
         } catch (\Exception $e) {
@@ -80,6 +92,7 @@ class Router {
                 ->status(500)
                 ->send($e->getMessage());
         }
+
         return $response;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Http;
 
-final class Server extends \Http\Router {
+class Server extends \Http\Router {
 
     private static \Http\Server $server;
 

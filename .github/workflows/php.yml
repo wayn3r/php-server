@@ -29,12 +29,13 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
+    # running tests
     - name: Run test suite
       run: composer test
-    - name: Run linter
-      run: composer lint
+    # fixing fixable errors before linting
     - name: Run linter fix
       run: composer lint:fix
+    # running linter
+    - name: Run linter
+      run: composer lint
+    

@@ -15,5 +15,5 @@ class ServerTest extends TestCase {
         $this->assertEquals($server, \Http\Server::getServer());
     }
 
-    // TODO: test start() method 
+    // TODO: test start() method
 }
